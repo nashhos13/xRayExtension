@@ -9,6 +9,7 @@ module.exports = {
     options: path.resolve('src/options/options.tsx'),
     background: path.resolve('src/background/background.ts'),
     contentScript: path.resolve('src/contentScript/contentScript.ts'),
+    product: path.resolve('src/product/product.html.tsx')
   },
   module: {
     rules: [
@@ -48,7 +49,8 @@ module.exports = {
     }),
     ...getHtmlPlugins([
       'popup',
-      'options'
+      'options',
+      'product'
     ]),
   ],
   output: {

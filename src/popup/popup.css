@@ -1,3 +1,13 @@
 body {
-  background-color: #1c1c1c;
+  height: 400px;
+  width: 800px;
+  background-color: whitesmoke;
+}
+
+h3 {
+  color: red;
+}
+
+img {
+  width: 400px;
 }
