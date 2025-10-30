@@ -13,15 +13,17 @@
     "default_title": "xRay Extension",
     "default_icon": "icon.png"
   },
-  "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
-  "options_page": "options.html",
+  "permissions": ["storage", "contextMenus", "scripting", "tabs"],
+  "host_permissions": ["https://api.tryxray.ai/"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'" 
+  },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://*/*"], 
       "js": ["contentScript.js"]
     }
   ]

@@ -1,22 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import Carousel from 'react-material-ui-carousel';
 import * as Mui from '@mui/material'
 import './popup.css';
+import { number } from 'framer-motion';
+
+// Most components are going to be used in the Content Script. The Popup is no longer active
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log(message);
     sendResponse("Message has been RECEIVED")
 })
 
-function ImageSlide( {productImages} ) {
+export function sendMessageToBackground(object) {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(object, (res) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError)
+            } else {
+                resolve(res)
+            }
+        })
+    })
+}
+
+export function ImageSlide( {productImages, indicators = false, navButtonsVisible = false} ) {
     return (
 
             <Carousel 
-                indicators={true}
+                indicators={indicators}
                 interval={1500}
-                navButtonsAlwaysInvisible={true}
-                sx={{width: '30%'}}
+                navButtonsAlwaysInvisible={navButtonsVisible}
+                sx={{
+                    width: {xs: '100%', sm: '90%', md: '80%'},
+                    mx: 'auto'
+                }}
             >
                 {
                     productImages.map(img => <Mui.Box
@@ -27,7 +45,7 @@ function ImageSlide( {productImages} ) {
                                 overflow: 'hidden',
                             }}
                          >
-                            <img src={img} style={{
+                            <img className='receipt-image' src={img} style={{
                                 position: 'absolute',
                                 top: 0,
                                 left: 0,
@@ -41,7 +59,7 @@ function ImageSlide( {productImages} ) {
     )
 }
 
-function ProductProfile({title, price}) {
+export function ProductProfile({title, price}) {
 
     return (
         <div style={{display: 'flex', flexDirection: 'column', height: '50%', width: '40%'}}>
@@ -51,88 +69,628 @@ function ProductProfile({title, price}) {
     )
 }
 
-function ProductDescription({description}) {
+export function ProductDescription({description}) {
     return (
         <div style={{width: 'auto', margin: '0 10%'}}>
-            <h3>{description}</h3>
+            <ul>
+                {description.map((d) => (
+                    <li>{d}</li>
+                ))}
+            </ul>
         </div>
     )
 }
 
-function PurchaseButton() {
+export function ProductFinePrint({details, descriptions}) {
+    if (details.length > 0) {
+        return (
+            <div style={{width: 'auto', margin: '0 10%'}}>
+                <h1 style={{textAlign: 'center'}}>Fine Print</h1>
+                <ul>
+                    {details.map((detail, index) => {
+                        const [key, value] = Object.entries(detail)[0];
+                        return <li key={index}>{key}: {String(value)}</li>;
+                    })}
+                </ul>
+
+                <p> {descriptions} </p>
+            </div>
+        )
+    }
+}
+
+export function PurchaseButton() {
     return (
-            <Mui.Button href='/options.html'
+            <Mui.Button href='/product.html'
             sx={{width: '250px', height: '85px'}} variant='contained'>
             <span style={{fontSize: '3em', fontFamily: 'Verdana'}}>Purchase</span>
             </Mui.Button>
     )
 }
 
-function cleanImgArray(images) {
-    var cleanImgArray = []
-    
-    images.forEach((img) => {
+export function LoadingPage() {
+    return (
+        <div>
+             <h1> Still Loading Product</h1>
+        </div>
+    )
+}
 
-        const imageLink = setImageLink(img)
-        if (imageLink != 'NO LINK' && !cleanImgArray.includes(imageLink)) {
-            cleanImgArray.push(imageLink)
+export function SignUpRequired() {
+    return (
+        <div id='SignUp_div' style={{position: 'fixed', width: '200px', top: '165px', right: '25px', height: '200px', justifyContent: 'center', background: 'radial-gradient(100% 60% at 50% 0%, rgb(231, 243, 255) 0%, rgb(227, 231, 255) 1124%, rgb(243, 235, 253) 90%, rgb(252, 253, 255) 100%) no-repeat fixed, linear-gradient(rgb(229, 242, 250) 0%, rgb(250, 249, 254) 100%)'}}>
+            <h1>Sorry!!! You Must Sign Up Here!!!!!: <br /></h1>
+            <a href='https://tryxray.ai'>Join xRay</a>
+        </div>
+    )
+}
+
+
+
+export function cleanImgArray(productCache) {
+    var cleanImgArray = []
+    const images = productCache.images
+    const type = productCache.type
+
+
+    if (type == 'shopify') {
+        
+        images.forEach((img) => {
+            const imageLink = setShopifyImageLink(img)
+            if (imageLink != 'NO LINK' && !cleanImgArray.includes(imageLink)) {
+                cleanImgArray.push(imageLink)
+            }
+        })
+
+        return cleanImgArray
+
+    } else if (type == 'amazon') {
+
+        images.forEach((img) => {
+            var imageLink = img
+            if (img.includes("US40")) {
+                imageLink = img.replace("US40", "US460")  // NEEDS WORK !!!!!!!!!!!!!!!!!!!!!!!!!!!
+            }
+            
+            if (!cleanImgArray.includes(imageLink)) {
+                cleanImgArray.push(imageLink)
+            }
+        })
+
+        return cleanImgArray
+
+    }
+
+}
+
+export function cleanDescriptionArray(descriptions) {
+    var cleanDescriptionArray = []
+
+    console.log("TYPE?? ", descriptions)
+
+    descriptions.forEach((d) => {
+
+        if (!cleanDescriptionArray.includes(d)) {
+            cleanDescriptionArray.push(d)
         }
 
     })
 
-    return cleanImgArray
+    return cleanDescriptionArray
+
 }
 
-function setImageLink(image) {
+export function setShopifyImageLink(image) {
     var imageLink = ''
     
     if (image.src != '') {
         imageLink = image.src
     } else if (image.currentSrc != '') {
         imageLink = image.currentSrc
+    } else if (image.lazySrc != '') {
+        imageLink = image.lazySrc
     } else {
         imageLink = "NO LINK"
     }
 
     return imageLink
+} 
+
+export function checkUserKey(key) {
+
+    return chrome.storage.local.get([key]).then((result) => {
+        console.log("Uer Valid?? --> ", result[key])
+        return result[key] === true
+    }) 
+
 }
 
-chrome.storage.local.get('product').then((result) => {
-    console.log("PRODUCT: ", result.product.images)
+// ---------------------------------------------------- "Match Found" page ---------------------------------------
+// xRay AI logo sector
+// Product Image Carousel 
+// You Save!!!! - sector
+// Product Title and variant
+// Price Sector
+// Specifications
+// Buttons - Exact Match, Not Match but Buy Anyway, Try Again
+ 
+export function MatchFound({ product, setView,  renderedVariant, setVariant, variantIndex }) {
 
-    const productImages = result.product.images
-    const newImageArray = cleanImgArray(productImages)
+     // Product Variant array --> used to set product info for backend request
+    console.log("Current variant ++ ", renderedVariant)
+    let productState = renderedVariant
+    let masterKey = '';
 
-    console.log("Prices: ", result.product.price)
+    Object.entries(renderedVariant).map(([key, value]) => {
+        const masterKeySnippet = key + ':' + value['id'] + ';'
+        masterKey += masterKeySnippet
+    })
+
+    const finalKey = masterKey.slice(0, -1)
+
+    console.log("MASTER KEY: ", finalKey)
+
+    // const rawSourcePrice = product.their_price.replace('$', '')
+    // const rawNewPrice = product.skus[variantIndex]['sku_price'].replace('$', '')
+    // const savings = (Number(rawSourcePrice) - Number(rawNewPrice)).toFixed(2)
+    // const percent = ((Number(savings) / Number(rawSourcePrice)) * 100).toFixed(2)
+
+    const changeVariant = (event) => {
+        console.log("Variant Change:", event.target.id)
+        const selectedVariant = Number(event.target.value)
+        setVariant(selectedVariant)
+    }
+
+    
+
+    const VARIANTS = product.skus.variant_labels
+    const productIndex = product.skus.sku_index
+    const theirPrice = Number(product.their_price.slice(1))
+    const sourcePrice = Number(productIndex[finalKey])
+    const diff = (theirPrice - sourcePrice).toFixed(2)
+
+    console.log("typeOf : ", typeof theirPrice)
+    console.log("Variant to send: ", productIndex[finalKey] )
+    console.log("Their Price:" , theirPrice)
+
+    const updateProductState = (select) => {
+
+        console.log("Option selected: ", select.target)
+        console.log("Value selected: ", select.target.value)
+
+        const variantChanged = select.target.id
+        const newVariant = select.target.value
+
+        const updatedProductState = {...productState}
+        
+
+        // Update productState with new value object of selected value.id
+        for (const key in VARIANTS) {
+            if (VARIANTS[key].id === variantChanged) {
+                VARIANTS[key].values.forEach((value) => {
+                    if (value.id === newVariant) {
+                        updatedProductState[variantChanged] = value
+                    }
+                })
+            }
+        }
+
+        setVariant(updatedProductState)
+
+        console.log("New Product State: ", updatedProductState)
+    } 
+
+    // Check which variant contains img:
+    let imgDisplayed; 
+    for (const key in renderedVariant) {
+        if (renderedVariant[key].hasOwnProperty('image')) {
+            imgDisplayed = renderedVariant[key].image
+        }
+    }
+
+    /*
+
+    // Set view of Product variant 
+    const goToCheckout = async () => {
+        
+        const masterKey = () => {
+            var key = ''
+            for (const key in productState) {
+                const pairToAdd = key + ':' productState[key] + ';'
+                key = key + pairToAdd
+            }
+
+            const master = key.slice(0, -1)
+
+            return master
+        }
+
+        await chrome.storage.local.set({
+            productVariant: masterKey
+        })
+        setView('checkout')
+    }
+    */
+
+    Object.entries(VARIANTS).map(([key, value]) => {
+        console.log(`Key: ${key['id']} -- Values:`)
+        value['values'].forEach((label) => {
+            console.log(`Value: ${label.label} -- ${label.id}`)
+        })
+    })
+
+    product['selectedVariantID'] = finalKey
+
+                        
+
+    return (
+        <div id='MatchFoundPage' style={{ textAlign: 'center', width: '300px', background: 'radial-gradient(100% 60% at 50% 0%, rgb(231, 243, 255) 0%, rgb(227, 231, 255) 1124%, rgb(243, 235, 253) 90%, rgb(252, 253, 255) 100%) no-repeat fixed, linear-gradient(rgb(229, 242, 250) 0%, rgb(250, 249, 254) 100%)' }}>
+    
+            <h1 id="MatchFoundDisplay" style={{ marginBottom: '20px' }}>Potential Match Found!!!</h1>
+            <div id="ImageSlideOne" style={{ display: 'flex', justifyContent: 'center', width: '80%', marginLeft: '10%' }}>
+                {/* <ImageSlide productImages={product.matched_product_images} /> */}
+                <img src={imgDisplayed} style={{width: '80%'}}/>
+            </div>
+            <div id='InfoSection' style={{
+                maxHeight: '150px',
+                overflowY: 'auto',
+                border: '1px solid #ccc',
+                padding: '5px',
+                marginTop: '5%',
+                marginBottom: '5%'
+            }}>
+                <div id="ProductTitle" style={{ display: 'flex', alignItems: 'center', gap: '20px'}}>
+                    <h2 style={{fontSize: '1.25em'}}>{product.matched_product_title}</h2>
+                    <div>
+                        {Object.entries(VARIANTS).map(([variant, labels]) => (
+                        <div>
+                            <span>{variant}:</span>
+                            <select id={labels['id']} onChange={updateProductState}>
+                                {labels['values'].map((value) => (
+                                <option value={value.id}>
+                                    {value.label}
+                                </option>
+                                ))}
+                            </select>
+                        </div>
+                        ))}
+        
+                    </div>
+                </div>
+                <div id="PriceSector" style={{display: 'flex'}}>
+                    <div id='TheirPrice'>
+                        <p>Their Price</p>
+                        <h3>{product.their_price}</h3>
+                    </div>
+                    <div id='SourcePrice' style={{marginLeft: 'auto'}}>
+                        <p>Source Price</p>
+                        <h3>{sourcePrice}</h3>
+                    </div>
+                </div>
+                <h3 id="Savings">You Save --- <span style={{color: 'green'}}>${diff}</span> </h3>
+                <div id='ItemDetails' className='leftAlign'>
+                    <ul>
+                        <li>Detail 1</li>
+                        <li>Detail 2</li>
+                        <li>Detail 3</li>
+                    </ul>
+                </div>
+            </div>
+            <div id='NextStepButtons'>
+                <button id='MatchButton' style={{color: 'white', backgroundColor: 'skyblue'}} onClick={() => setView('checkout')}>Match</button>
+                <button id='BuyAnywayButton' style={{backgroundColor: '#616161'}} onClick={() => setView('checkout')}>Buy Anyway</button>
+            </div>
+        </div>
+    )
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+
+
+// -------------------------------------------------------- Checkout Page ----------------------------------------
+export function Checkout({ product, setView, variantIndex, renderedVariant }) {
+    const [orderInfo, setOrderInfo] = useState(null)
+
+    console.log("Transferred Product:", product)
+
+    let imgDisplayed; 
+    for (const key in renderedVariant) {
+        if (renderedVariant[key].hasOwnProperty('image')) {
+            imgDisplayed = renderedVariant[key].image
+        }
+    }
+
+    useEffect(() => {
+        async function fetchOrderDetails() {
+
+            try {
+                chrome.storage.local.get('xRayId').then(async (result) => {
+                    if (result.xRayId) {
+
+                        // GET PRODUCT VARIANT
+
+                        const customerInfo = {
+                            user_id: result.xRayId,
+                            scan_id: product.scan_run_id,
+                            selected_sku: product['selectedVariantID']
+                        }
+
+                        console.log("Customer Info: ", customerInfo)
+
+                        const orderInfo = await sendMessageToBackground({message: "ODR", payload: customerInfo})
+                        console.log("Order Details found --> ", orderInfo)
+
+                        setOrderInfo(orderInfo['message'])
+
+                        chrome.storage.local.set({
+                            latestOrderInfo: orderInfo['message']
+                        })
+
+                    }
+                })
+            
+            } catch (error) {
+                console.error("Failed to receive valid order details: ", error)
+            }
+        }
+
+        fetchOrderDetails();
+    }, [])
+
+    const sendToCheckout = async () => {
+        const user_ID = await chrome.storage.local.get('xRayId')
+        const scan_ID = product.scan_run_id
+
+        const scanInfo = {
+            userID: user_ID['xRayId'],
+            scanID: scan_ID
+        }
+
+        console.log("payload: ", scanInfo)
+
+        try {
+
+            const url_payload = await sendMessageToBackground({message: "COR", payload: scanInfo})
+
+        } catch (error) {
+            console.error('Checkout request failed:', error)
+        }
+
+        
+    }
+
+
+
+    // Different Full HTML
+    return orderInfo ? (
+        <div id='CheckoutPage' style={{width: '500px'}}>
+            <div id='topArrow' style={{display: 'flex', justifyContent: 'flex-start'}}>
+                <button id='previous' style={{width: '10%', backgroundColor: '#42aff5', color: 'white'}} onClick={() => setView('matchfound')}>&larr;</button>   
+            </div>
+            <div id='ImageAndTitleView' style={{display: 'flex', margin: '5px 7.5%'}}>
+                <div id="ImageSlideTwo" style={{flex: 1}}>
+                    {/* <ImageSlide productImages={product.matched_product_images} indicators={false} navButtonsVisible={false}/> */}
+                    <img src={imgDisplayed} style={{width: '100%', border: 'solid', alignItems: 'center'}}/>
+                </div>
+                <div id='ItemTitle' style={{
+                    flex: 1, textAlign: 'center', alignItems: 'center',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center'
+                }}>
+                    <h1 style={{fontSize: '1.25em', maxHeight: '250px', overflow: 'scroll', scrollbarWidth: 'none'}}>{product.matched_product_title}</h1>
+                </div>
+            </div>
+            <h3 style={{fontSize: '.75em', width: "80%", whiteSpace: 'nowrap', overflow: 'hidden', padding: '0 10%', justifyContent: 'center'}}>
+                    XRAYED ON: <span style={{overflow: 'scroll'}}>{window.location.href}</span>
+            </h3>
+            <div id='OrderSummary' style={{display: 'flex', flexDirection: 'column', margin: '0 5%', border: '1px solid gray', borderRadius: '10%'}}>
+                <h1 style={{textAlign: 'center'}}>Order Summary</h1>
+                <div id='MarketPrice' style={{display: 'flex'}}>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Market Price:</span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}></span>
+                </div>
+                <div id='OurSourcePrice' style={{display: 'flex'}}>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Source Price:</span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}></span>
+                </div>
+                <div id='ShippingDetails' style={{display: 'flex'}}>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Shipping (Est. Delivery; {orderInfo.shipping_date}):</span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}>{orderInfo.shipping_price} </span>
+                </div>
+                <div id='TaxPrice' style={{display: 'flex'}}>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Tax:</span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}>{orderInfo.tax}</span>
+                </div>
+                <div id='PurchaseProtection' style={{display: 'flex'}}>
+                    <span style={{ fontWeight: 'bold', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Purchase Protection:</span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}>{orderInfo.xray_purchase_protection}</span>
+                </div>
+                <button id='PurchaseProtectionDetails' style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        marginLeft: '15%',
+                        width: '50%',
+                        textAlign: 'left',
+                        color: 'gray',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                    }}>
+                    What is This?
+                </button>
+                <p style={{textAlign: 'center'}}>_____________________________________</p>
+
+                <div id='TotalCost' style={{display: 'flex', margin: '5%'}}>
+                    <span style={{ fontWeight: 'bold', fontSize: '2.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Total:</span>
+                    <span style={{ fontWeight: '600', fontSize: '2.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}>{orderInfo.total}</span>
+                </div>
+            </div>
+            <div id='SavingsAndPurchase' style={{display: 'flex', margin: '5px 15%'}}>
+                <button id="Savings" style={{flex: 1, borderRadius: '20%', color: 'white', textAlign: 'center', backgroundColor: 'green', marginRight: '5%'}}>You Saved {orderInfo.xray_savings_amount} ({orderInfo.xray_savings_percent})!!!</button>
+                <button id='Checkout' style={{flex: 1, borderRadius: '20%', color: 'black', textAlign: 'center', backgroundColor: 'skyblue', marginLeft: '5%'}} onClick={sendToCheckout}>Stripe <br/> Secure Checkout</button>
+            </div>
+        </div>
+    ) : <div> Loading... </div>
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+// ----------------------------------------------- Order Confirmed Page -----------------------------------------------------------
+export function OrderConfirmed({ product, setView }) {
+
+    const [order, setOrder] = useState(null)
+
+    chrome.storage.local.get('latestOrderInfo').then((result) => {
+        if (result.latestOrderInfo) {
+            setOrder(result.latestOrderInfo)
+        }
+    })
+
+    return order ? (
+        <div id='OrderConfirmedPage' style={{width: '500px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <div id='topArrow' style={{display: 'flex', justifyContent: 'flex-start', width: '100%'}}>
+                <button id='previous' style={{width: '10%', backgroundColor: '#42aff5', color: 'white'}} onClick={() => setView('checkout')}>&larr;</button>   
+            </div>
+            <div id='ThankYouSector' style={{textAlign: 'center', display: 'flex', flexDirection: 'column'}}>
+                <h1 style={{margin: '0'}}>Order Confirmed!!!</h1>
+                <h3>Thank you for letting us help you save! <br/>
+                A receipt will be sent to your inbox shortly.</h3>
+            </div>
+            <div id='ProductSummarySector' style={{border: '1px solid black', borderRadius: '5%', width: '80%'}}>
+                <div id='ImageAndTitleViewAndDOD' style={{display: 'flex', margin: '5px 7.5%'}}>
+                    {/* <div id="ImageSlideTwo" style={{flex: 1, marginTop: '25%'}}><ImageSlide productImages={product.images} indicators={false} navButtonsVisible={false}/></div> */}
+                    <div id='ItemTitle' style={{
+                        flex: 1, textAlign: 'center', alignItems: 'center',
+                        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                        marginLeft: '5%'
+                    }}>
+                        <h1 style={{fontSize: '1.25em', margin: '10px'}}>{product.matched_product_title}</h1>
+                        <h3>
+                            XRAYED ON: <br />
+                            Website.com
+                        </h3>
+                        <h2>Total: {order.total}</h2>
+                    </div>
+                </div>
+                <div id='DeliveryInfo' style={{textAlign: 'center', display: 'flex', flexDirection: 'column'}}>
+                    <b style={{margin: '1% 0'}}>Order Number: 832befw4he2</b>
+                    <b style={{margin: '1% 0'}}>Est. Delivery: September 26, 2025</b>
+                </div>
+            </div>
+
+            <div id='CongratulationsSector' style={{display: 'inline-block', padding: '0.5rem', textAlign: 'center', marginTop: '5%', border: '1px solid black', borderRadius: '10%'}}>
+                <h1 style={{paddingRight: '10px'}}>Congratulations!</h1>
+                <h3>You just saved</h3>
+                <h2 style={{color: 'green'}}>$25.00</h2>
+                <h3>In 40 seconds with xRay!</h3>
+            </div>
+
+            <h3 style={{textAlign: 'center'}}>Help your friends save and <br/>
+                <b>get $5 off your next checkout!</b>
+            </h3>
+
+            <button id='ShareButton' style={{fontSize: '2em', color: 'white', backgroundColor: 'black', marginBottom: '5px'}}>Share</button>
+            <button id='DismissButton' style={{fontSize: '2em', color: 'white', backgroundColor: 'skyblue', marginTop: '5px'}}>Dismiss xRay</button>
+        </div>
+    ) : <div>Loading ...</div>
+}
+// --------------------------------------------------------------------------------------------------------------------------------
+
+
+export function ChromeApp({ product, checkoutID, url }) {
+
+    console.log("Checkout id IN APP", "((", checkoutID, "))")
+    console.log("Url IN APP", url)
+
+    const [validUser, setValidUser] = useState(null);
+    const [view, setView] = useState('matchfound');
+    const [variant, setVariant] = useState(setInitialProduct(product))
+
+    useEffect(() => {
+        checkUserKey("xRayCertified").then(setValidUser);
+    }, []);
+
+    if (validUser === null) return <SignUpRequired />;
+    if (!validUser) return <SignUpRequired />;
+
+    console.log("IDK?? --> ", view)
+
+    let page;
+ 
+    if (product.matched_product_title) {
+
+        if (checkoutID && url.includes('success?session_id=' + checkoutID)) {
+            console.log("ORDERED")
+            page = <OrderConfirmed product={product} setView={setView} />;
+        } else if (view === 'checkout') {
+            console.log("CHECKOUT")
+            page = <Checkout product={product} setView={setView} renderedVariant={variant} variantIndex={variant} />;
+        } else if (view === 'matchfound' ) {
+            console.log("MATCH FOUND -- ", variant)
+            page = <MatchFound product={product} setView={setView} renderedVariant={variant} setVariant={setVariant} variantIndex={variant} />;
+        }
+
+        return <>{page}</>;
+        
+    }
+
+
+}
+
+function setInitialProduct(product) {
+
+    let productState ={}
+
+    const VARIANTS = product.skus.variant_labels
+
+    for (const key in VARIANTS) {
+        const newKey = VARIANTS[key].id
+        const baseValue = VARIANTS[key].values[0]
+
+        console.log(`Key: ${newKey} ---- Value: ${baseValue}`)
+
+        // if (baseValue.hasOwnProperty("image")) {
+        //     console.log(`${newKey} decides render`)
+        // }
+
+        productState[newKey] = baseValue
+    }
+    
+    console.log("Variants: ", VARIANTS)
+
+    console.log("Product State --> ", productState)
+
+    return productState
+}
+
+/*
+------------------------------ ONLY USED IF WE WANT TO IMPLEMENT POPUP --------------------------------
+
+chrome.storage.local.get('productCache').then(async (result) => {
+    console.log("PRODUCT: ", result.productCache)
+    let finalProduct;
+
+    const checkoutSessionID = await chrome.storage.local.get('checkoutID')
+    const currentUrl = await chrome.storage.local.get('lastUrlScraped')
+
+    console.log("currentUrl", currentUrl)
+    console.log("chekoutID", checkoutSessionID)
+
+    if (result.productCache != undefined) {
+        
+
+        finalProduct = result.productCache
+
+    }
 
     const rootElement = document.createElement('div')
-    rootElement.style.height = '450px'
-    rootElement.style.display = 'flex'
-    rootElement.style.flexWrap = 'wrap'
-    rootElement.style.alignItems = 'center';
-    rootElement.style.justifyContent = 'center';
-    rootElement.style.gap = '15px';
+
     document.body.appendChild(rootElement)
     const root = ReactDOM.createRoot(rootElement)   
     
-    root.render(<>
-    <ImageSlide productImages={newImageArray}/>
-    <ProductProfile title={result.product.title} price={result.product.price}/>
-    <ProductDescription description={result.product.description}/>
-    <PurchaseButton />
-    </>)
+
+    root.render(<><ChromeApp product={finalProduct} checkoutID={checkoutSessionID['checkoutID']} url={currentUrl['lastUrlScraped']}/></>)
+    chrome.storage.local.remove('productCache')
 
 
-    // for (var i = 0; i < newImageArray.length; i++) {
-
-    //     const rootElement = document.createElement('div')
-    //     document.body.appendChild(rootElement)
-    //     const root = ReactDOM.createRoot(rootElement)
-
-    //     root.render(<Product
-    //     image={newImageArray[i]}
-    //     price="0.00"
-    //     />)        
-    
-    // }
 })
+*/

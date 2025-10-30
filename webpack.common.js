@@ -6,10 +6,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
   entry: {
     popup: path.resolve('src/popup/popup.tsx'),
-    options: path.resolve('src/options/options.tsx'),
     background: path.resolve('src/background/background.ts'),
-    contentScript: path.resolve('src/contentScript/contentScript.ts'),
-    product: path.resolve('src/product/product.html.tsx')
+    contentScript: path.resolve('src/contentScript/contentScript.tsx'),
   },
   module: {
     rules: [
@@ -20,7 +18,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.(jpg|jpeg|png|woff|woff2|eot|ttf|svg)$/,
@@ -48,9 +46,7 @@ module.exports = {
       ]
     }),
     ...getHtmlPlugins([
-      'popup',
-      'options',
-      'product'
+      'popup'
     ]),
   ],
   output: {
