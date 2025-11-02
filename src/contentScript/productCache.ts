@@ -1,17 +1,25 @@
 // productCache.ts
-type ProductCache = {
+// productCache.ts
+export type ProductCache = {
   userID: string | null;
   url: string | null;
   type: string | null;
   price: string[];
-  images: string[];
+  images: Array<string | {
+    element?: HTMLImageElement;
+    src: string;
+    alt: string;
+    currentSrc: string;
+    lazySrc: string | null;
+  }>;
   title: string | null;
   descriptions: string[];
   techDetails: string[];
   techDescription: string[];
 };
 
-const cache: ProductCache = {
+// Mutable cache object - exported so other modules can read/write the same reference
+export const productCache: ProductCache = {
   userID: null,
   url: null,
   type: null,
@@ -23,16 +31,19 @@ const cache: ProductCache = {
   techDescription: []
 };
 
-export const productCache = {
-  get: () => cache,
-  update: (partial: Partial<ProductCache>) => Object.assign(cache, partial),
+// Helper API for safe operations against the above cache
+export const productCacheAPI = {
+  get: () => productCache as ProductCache,
+  update: (partial: Partial<ProductCache>) => Object.assign(productCache, partial),
   reset: () => {
-    Object.keys(cache).forEach((key) => {
-      if (Array.isArray(cache[key as keyof ProductCache])) {
-        (cache[key as keyof ProductCache] as string[]) = [];
-      } else {
-        cache[key as keyof ProductCache] = null;
-      }
-    });
+    productCache.userID = null;
+    productCache.url = null;
+    productCache.type = null;
+    productCache.price.length = 0;
+    productCache.images.length = 0;
+    productCache.title = null;
+    productCache.descriptions.length = 0;
+    productCache.techDetails.length = 0;
+    productCache.techDescription.length = 0;
   }
 };

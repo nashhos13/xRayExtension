@@ -52,11 +52,14 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: path.resolve('dist'),
+    publicPath: '/',
+    chunkFilename: '[name].js',
   },
   optimization: {
     splitChunks: {
       chunks(chunk) {
-        return chunk.name !== 'contentScript' && chunk.name !== 'background'
+        // Don't split background or contentScript so they stay self-contained in MV3
+        return chunk.name !== 'contentScript' && chunk.name !== 'background';
       }
     },
   }
