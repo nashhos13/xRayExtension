@@ -216,6 +216,7 @@ export function checkUserKey(key) {
  
 export function MatchFound({ product, setView,  renderedVariant, setVariant, variantIndex }) {
 
+    console.log("PRODUCT INFO: ", product)
      // Product Variant array --> used to set product info for backend request
     console.log("Current variant ++ ", renderedVariant)
     let productState = renderedVariant
@@ -229,6 +230,7 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
     const finalKey = masterKey.slice(0, -1)
 
     console.log("MASTER KEY: ", finalKey)
+    console.log("TOTAL VARIANTS:", product.skus['variant_label_count'])
 
     // const rawSourcePrice = product.their_price.replace('$', '')
     // const rawNewPrice = product.skus[variantIndex]['sku_price'].replace('$', '')
@@ -241,17 +243,32 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
         setVariant(selectedVariant)
     }
 
-    
+    let VARIANTS
+    let productIndex
+    let theirPrice
+    let sourcePrice 
+    let diff
 
-    const VARIANTS = product.skus.variant_labels
-    const productIndex = product.skus.sku_index
-    const theirPrice = Number(product.their_price.slice(1))
-    const sourcePrice = Number(productIndex[finalKey])
-    const diff = (theirPrice - sourcePrice).toFixed(2)
 
-    console.log("typeOf : ", typeof theirPrice)
-    console.log("Variant to send: ", productIndex[finalKey] )
-    console.log("Their Price:" , theirPrice)
+    if (product.skus.variant_label_count > 0) {
+
+        console.log("Variants ARe there")
+        VARIANTS = product.skus.variant_labels
+        productIndex = product.skus.sku_index
+        theirPrice = Number(product.their_price.slice(1))
+        sourcePrice = (Number(productIndex[finalKey]['price']).toFixed(2)) 
+        diff = (theirPrice - sourcePrice).toFixed(2)
+
+    } else {
+
+        theirPrice = Number(product.their_price.slice(1))
+        sourcePrice = (Number(product.source_price.slice(1))).toFixed(2)
+
+    }
+
+    // console.log("typeOf : ", typeof theirPrice)
+    // console.log("Variant to send: ", productIndex[finalKey] )
+    // console.log("Their Price:" , theirPrice)
 
     const updateProductState = (select) => {
 
@@ -288,40 +305,67 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
         }
     }
 
-    /*
-
-    // Set view of Product variant 
-    const goToCheckout = async () => {
-        
-        const masterKey = () => {
-            var key = ''
-            for (const key in productState) {
-                const pairToAdd = key + ':' productState[key] + ';'
-                key = key + pairToAdd
-            }
-
-            const master = key.slice(0, -1)
-
-            return master
-        }
-
-        await chrome.storage.local.set({
-            productVariant: masterKey
-        })
-        setView('checkout')
-    }
-    */
-
-    Object.entries(VARIANTS).map(([key, value]) => {
-        console.log(`Key: ${key['id']} -- Values:`)
-        value['values'].forEach((label) => {
-            console.log(`Value: ${label.label} -- ${label.id}`)
-        })
-    })
+    // Object.entries(VARIANTS).map(([key, value]) => {
+    //     console.log(`Key: ${key['id']} -- Values:`)
+    //     value['values'].forEach((label) => {
+    //         console.log(`Value: ${label.label} -- ${label.id}`)
+    //     })
+    // })
 
     product['selectedVariantID'] = finalKey
 
-                        
+    console.log("Current Variant info -----> ", product.skus.sku_index[finalKey])
+
+    if (product.skus.variant_label_count === 0) {
+       return (
+        <div id='MatchFoundPage' style={{ textAlign: 'center', width: '300px', background: 'radial-gradient(100% 60% at 50% 0%, rgb(231, 243, 255) 0%, rgb(227, 231, 255) 1124%, rgb(243, 235, 253) 90%, rgb(252, 253, 255) 100%) no-repeat fixed, linear-gradient(rgb(229, 242, 250) 0%, rgb(250, 249, 254) 100%)' }}>
+    
+            <h1 id="MatchFoundDisplay" style={{ marginBottom: '20px' }}>Potential Match Found!!!</h1>
+            <div id="ImageSlideOne" style={{ display: 'flex', justifyContent: 'center', width: '80%', marginLeft: '10%' }}>
+                <ImageSlide productImages={product.matched_product_images} />
+            </div>
+            <div id='InfoSection' style={{
+                maxHeight: '150px',
+                overflowY: 'auto',
+                border: '1px solid #ccc',
+                padding: '5px',
+                marginTop: '5%',
+                marginBottom: '5%'
+            }}>
+                <div id="ProductTitle" style={{ display: 'flex', alignItems: 'center', gap: '20px'}}>
+                    <h2 style={{fontSize: '1.25em'}}>{product.matched_product_title}</h2>
+
+                </div>
+                <div id="PriceSector" style={{display: 'flex'}}>
+                    <div id='TheirPrice'>
+                        <p>Their Price</p>
+                        <h3>${theirPrice}</h3>
+                    </div>
+                    <div id='SourcePrice' style={{marginLeft: 'auto'}}>
+                        <p>Source Price</p>
+                        <h3>${sourcePrice}</h3>
+                    </div>
+                </div>
+                <h3 id="Savings">You Save --- <span style={{color: 'green'}}>${(theirPrice - sourcePrice)}</span> </h3>
+                <div id='ItemDetails' className='leftAlign'>
+                    <ul>
+                        <li>Detail 1</li>
+                        <li>Detail 2</li>
+                        <li>Detail 3</li>
+                    </ul>
+                </div>
+            </div>
+            <div id='NextStepButtons'>
+                (
+                    <>
+                        <button id='MatchButton' style={{color: 'white', backgroundColor: 'skyblue'}} onClick={() => setView('checkout')}>Match</button>
+                        <button id='BuyAnywayButton' style={{backgroundColor: '#616161'}} onClick={() => setView('checkout')}>Buy Anyway</button>
+                    </>
+                ) 
+            </div>
+        </div> 
+       )               
+    }
 
     return (
         <div id='MatchFoundPage' style={{ textAlign: 'center', width: '300px', background: 'radial-gradient(100% 60% at 50% 0%, rgb(231, 243, 255) 0%, rgb(227, 231, 255) 1124%, rgb(243, 235, 253) 90%, rgb(252, 253, 255) 100%) no-repeat fixed, linear-gradient(rgb(229, 242, 250) 0%, rgb(250, 249, 254) 100%)' }}>
@@ -341,6 +385,8 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
             }}>
                 <div id="ProductTitle" style={{ display: 'flex', alignItems: 'center', gap: '20px'}}>
                     <h2 style={{fontSize: '1.25em'}}>{product.matched_product_title}</h2>
+
+                    {product.skus['variant_label_count'] > 0 ? (
                     <div>
                         {Object.entries(VARIANTS).map(([variant, labels]) => (
                         <div>
@@ -356,6 +402,8 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
                         ))}
         
                     </div>
+                    ) : null}
+
                 </div>
                 <div id="PriceSector" style={{display: 'flex'}}>
                     <div id='TheirPrice'>
@@ -364,7 +412,7 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
                     </div>
                     <div id='SourcePrice' style={{marginLeft: 'auto'}}>
                         <p>Source Price</p>
-                        <h3>{sourcePrice}</h3>
+                        <h3>${sourcePrice}</h3>
                     </div>
                 </div>
                 <h3 id="Savings">You Save --- <span style={{color: 'green'}}>${diff}</span> </h3>
@@ -377,8 +425,12 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
                 </div>
             </div>
             <div id='NextStepButtons'>
-                <button id='MatchButton' style={{color: 'white', backgroundColor: 'skyblue'}} onClick={() => setView('checkout')}>Match</button>
-                <button id='BuyAnywayButton' style={{backgroundColor: '#616161'}} onClick={() => setView('checkout')}>Buy Anyway</button>
+                {product.skus.sku_index[finalKey]['quantity'] > 0 ? (
+                    <>
+                        <button id='MatchButton' style={{color: 'white', backgroundColor: 'skyblue'}} onClick={() => setView('checkout')}>Match</button>
+                        <button id='BuyAnywayButton' style={{backgroundColor: '#616161'}} onClick={() => setView('checkout')}>Buy Anyway</button>
+                    </>
+                ) : <button style={{background: 'red', color: 'white', marginBottom: '10px'}}> OUT OF STOCK </button> }
             </div>
         </div>
     )
@@ -388,8 +440,10 @@ export function MatchFound({ product, setView,  renderedVariant, setVariant, var
 
 
 // -------------------------------------------------------- Checkout Page ----------------------------------------
-export function Checkout({ product, setView, variantIndex, renderedVariant }) {
+export function Checkout({ product, setView, variantIndex, setVariant, renderedVariant }) {
     const [orderInfo, setOrderInfo] = useState(null)
+    const selectedVariant = product['selectedVariantID']
+
 
     console.log("Transferred Product:", product)
 
@@ -412,7 +466,7 @@ export function Checkout({ product, setView, variantIndex, renderedVariant }) {
                         const customerInfo = {
                             user_id: result.xRayId,
                             scan_id: product.scan_run_id,
-                            selected_sku: product['selectedVariantID']
+                            selected_sku: selectedVariant
                         }
 
                         console.log("Customer Info: ", customerInfo)
@@ -459,18 +513,83 @@ export function Checkout({ product, setView, variantIndex, renderedVariant }) {
         
     }
 
+    if (!orderInfo) {
+        return <div> Loading Order Details... </div>
+    }
+
+    if (!orderInfo.shipping_date) {
+        return (
+            <div
+                id="ShippingDateError"
+                style={{
+                margin: '40px auto',
+                padding: '20px',
+                width: '80%',
+                backgroundColor: '#fff3f3',
+                border: '1px solid #f5c2c2',
+                borderRadius: '10px',
+                textAlign: 'center',
+                color: '#b00020',
+                fontWeight: '600',
+                boxShadow: '0 0 10px rgba(0,0,0,0.05)',
+                }}
+            >
+                ⚠️ Sorry — delivery isn’t available to your address for this option
+                <br />
+                Please try again later or contact support if the issue persists.
+                <br />
+                <button
+                    onClick={() => {setView('matchfound')}}
+                    style={{
+                    marginTop: '20px',
+                    padding: '10px 20px',
+                    backgroundColor: '#f5c2c2',
+                    color: '#b00020',
+                    border: 'none',
+                    borderRadius: '5px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    }}
+                >
+                    ← Go Back
+                </button>
+
+            </div>
+        )
+    }
+
+    const restoreProduct = (product) => {
+        setVariant(setInitialProduct(product))
+        setView('matchfound')
+    }
+
+    let priceToDisplay;
+
+    if (product.skus.variant_label_count > 0) {
+        priceToDisplay = product.skus.sku_index[selectedVariant]['price'].toFixed(2)
+    } else {
+        priceToDisplay = product.source_price
+    }
+
+    if (!priceToDisplay.includes('$')) {
+        priceToDisplay = '$' + priceToDisplay
+    }
+    
 
 
     // Different Full HTML
-    return orderInfo ? (
+    return (
         <div id='CheckoutPage' style={{width: '500px'}}>
             <div id='topArrow' style={{display: 'flex', justifyContent: 'flex-start'}}>
-                <button id='previous' style={{width: '10%', backgroundColor: '#42aff5', color: 'white'}} onClick={() => setView('matchfound')}>&larr;</button>   
+                <button id='previous' style={{width: '10%', backgroundColor: '#42aff5', color: 'white'}} onClick={() => {restoreProduct(product)}}>&larr;</button>   
             </div>
             <div id='ImageAndTitleView' style={{display: 'flex', margin: '5px 7.5%'}}>
                 <div id="ImageSlideTwo" style={{flex: 1}}>
-                    {/* <ImageSlide productImages={product.matched_product_images} indicators={false} navButtonsVisible={false}/> */}
-                    <img src={imgDisplayed} style={{width: '100%', border: 'solid', alignItems: 'center'}}/>
+                    
+                    {imgDisplayed ? (
+                        <img src={imgDisplayed} style={{width: '100%', border: 'solid', alignItems: 'center'}}/>
+                    ) : <ImageSlide productImages={product.matched_product_images} indicators={false} navButtonsVisible={false}/>}
+                     
                 </div>
                 <div id='ItemTitle' style={{
                     flex: 1, textAlign: 'center', alignItems: 'center',
@@ -486,11 +605,11 @@ export function Checkout({ product, setView, variantIndex, renderedVariant }) {
                 <h1 style={{textAlign: 'center'}}>Order Summary</h1>
                 <div id='MarketPrice' style={{display: 'flex'}}>
                     <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Market Price:</span>
-                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}></span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}>{product.their_price}</span>
                 </div>
                 <div id='OurSourcePrice' style={{display: 'flex'}}>
                     <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Source Price:</span>
-                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}></span>
+                    <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'right', width: '50%', marginRight: '15%'}}>{priceToDisplay}</span>
                 </div>
                 <div id='ShippingDetails' style={{display: 'flex'}}>
                     <span style={{ fontWeight: '600', fontSize: '1.25em', textAlign: 'left', width: '50%', marginLeft: '15%'}}>Shipping (Est. Delivery; {orderInfo.shipping_date}):</span>
@@ -529,7 +648,7 @@ export function Checkout({ product, setView, variantIndex, renderedVariant }) {
                 <button id='Checkout' style={{flex: 1, borderRadius: '20%', color: 'black', textAlign: 'center', backgroundColor: 'skyblue', marginLeft: '5%'}} onClick={sendToCheckout}>Stripe <br/> Secure Checkout</button>
             </div>
         </div>
-    ) : <div> Loading... </div>
+    )
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -603,7 +722,10 @@ export function ChromeApp({ product, checkoutID, url }) {
 
     const [validUser, setValidUser] = useState(null);
     const [view, setView] = useState('matchfound');
-    const [variant, setVariant] = useState(setInitialProduct(product))
+    const [variant, setVariant] = useState(() => {
+        return product ? setInitialProduct(product) : null;
+    });
+
 
     useEffect(() => {
         checkUserKey("xRayCertified").then(setValidUser);
@@ -611,7 +733,8 @@ export function ChromeApp({ product, checkoutID, url }) {
 
     if (validUser === null) return <SignUpRequired />;
     if (!validUser) return <SignUpRequired />;
-
+    
+ 
     console.log("IDK?? --> ", view)
 
     let page;
@@ -623,7 +746,7 @@ export function ChromeApp({ product, checkoutID, url }) {
             page = <OrderConfirmed product={product} setView={setView} />;
         } else if (view === 'checkout') {
             console.log("CHECKOUT")
-            page = <Checkout product={product} setView={setView} renderedVariant={variant} variantIndex={variant} />;
+            page = <Checkout product={product} setView={setView} renderedVariant={variant} setVariant={setVariant} variantIndex={variant} />;
         } else if (view === 'matchfound' ) {
             console.log("MATCH FOUND -- ", variant)
             page = <MatchFound product={product} setView={setView} renderedVariant={variant} setVariant={setVariant} variantIndex={variant} />;
@@ -638,7 +761,7 @@ export function ChromeApp({ product, checkoutID, url }) {
 
 function setInitialProduct(product) {
 
-    let productState ={}
+    let productState = {}
 
     const VARIANTS = product.skus.variant_labels
 
