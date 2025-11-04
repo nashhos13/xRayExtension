@@ -1,6 +1,7 @@
 import React from 'react';
 import { ImageSlide } from '../components/ImageSlide';
 import { formatPrice } from '../utils';
+import styled from '@emotion/styled';
 
 interface MatchFoundProps {
     product: any;
@@ -107,11 +108,7 @@ export function MatchFound({ product, setView, renderedVariant, setVariant, vari
                     </div>
                     <h3 id="Savings">You Save --- <span style={{ color: 'green' }}>{formatPrice(theirPrice - Number(sourcePrice))}</span></h3>
                     <div id='ItemDetails' className='leftAlign'>
-                        <ul>
-                            <li>Detail 1</li>
-                            <li>Detail 2</li>
-                            <li>Detail 3</li>
-                        </ul>
+                        <span id='product-description'>{product.product_description}</span>
                     </div>
                 </div>
                 <div id='NextStepButtons'>
@@ -177,11 +174,7 @@ export function MatchFound({ product, setView, renderedVariant, setVariant, vari
                 </div>
                 <h3 id="Savings">You Save --- <span style={{ color: 'green' }}>{formatPrice(diff)}</span></h3>
                 <div id='ItemDetails' className='leftAlign'>
-                    <ul>
-                        <li>Detail 1</li>
-                        <li>Detail 2</li>
-                        <li>Detail 3</li>
-                    </ul>
+                    <span id='product-description' style={{ color: 'red' }}>{product.product_description}</span>
                 </div>
             </div>
             <div id='NextStepButtons'>

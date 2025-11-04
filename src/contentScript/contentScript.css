@@ -1,12 +1,14 @@
 
 #stayOnPageMessage {
-  position: fixed;
-  top: 70px;
-  right: 175px;
-  z-index: 9999;
-  color: rgb(255, 255, 255);
-  font-weight: bold;
-  font-size: 16px;
+  position: fixed !important;
+  top: 70px !important;
+  right: 175px !important;
+  z-index: 99999 !important;
+  color: rgb(255, 255, 255) !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  display: block !important;
+  visibility: visible !important;
 }
 
 #stayOnPageQuoteBox {
@@ -75,63 +77,101 @@
   background: linear-gradient(90deg, rgb(201, 201, 167) 0%, rgb(235, 235, 37) 100%);
 }
 
-#matchNotFoundMessage {
-  position: fixed;
-  top: 200px;
-  right: 210px;
-  z-index: 9999;
-  color: white;
-  font-weight: 900;
-  font-size: 16px;
+#xProofBox {
+  position: fixed !important;
+  text-align: center !important;
+  width: 300px !important;
+  height: 75px !important;
+  top: 105px !important;
+  right: 125px !important;
+  z-index: 99999 !important;
+  font-size: 1.2em !important;
+  font-weight: 700 !important;
+  border-radius: 20px !important;
+  border: none !important;
+  color: white !important;
+  background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(16, 185, 129) 50%, rgb(5, 150, 105) 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
-#matchNotFoundQuoteBox {
-  position: fixed;
-  top: 170px;
-  right: 150px;
-  z-index: 9999;
-  width: 0;
-  height: 0;
-  border-top: 15px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 20px solid  rgb(146, 0, 0);
+#scanAbortedBox {
+  position: fixed !important;
+  text-align: center !important;
+  width: 280px !important;
+  height: 60px !important;
+  top: 115px !important;
+  right: 135px !important;
+  z-index: 99999 !important;
+  font-size: 1.1em !important;
+  font-weight: 700 !important;
+  border-radius: 15px !important;
+  border: 3px solid rgb(255, 152, 0) !important;
+  color: white !important;
+  background: linear-gradient(135deg, rgb(255, 152, 0) 0%, rgb(255, 193, 7) 50%, rgb(255, 235, 59) 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4), 0 3px 8px rgba(0, 0, 0, 0.1) !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
-#matchNotFoundBox {
-  position: fixed;
-  text-align: center;
-  width: 250px;
-  height: 50px;
-  top: 185px;
-  right: 150px;
-  z-index: 9999;
-  font-size: 1em;
-  border-radius: 10%;
-  border: 10px solid rgb(146, 0, 0);
-  color: white;
-  margin-bottom: 10%;
-  background: linear-gradient(90deg, rgb(255, 136, 136) 0%, rgb(250, 38, 38) 100%);
-}
-
-#activeScanner {
-  position: fixed;
-  display: flex;
-  width: 75px; 
-  height: 75px;
-  top: 105px;
-  right: 25px;
-  z-index: 9999;
+#scanAbortedScanner {
+  position: fixed !important;
+  display: flex !important;
+  width: 75px !important; 
+  height: 75px !important;
+  top: 105px !important;
+  right: 25px !important;
+  z-index: 99999 !important;
   padding: 1em 2.8em; 
   margin-top: 0.19em; 
-  background: linear-gradient(90deg, rgb(56, 189, 248) 0%, rgb(167, 139, 250) 100%); 
-  color: rgb(255, 255, 255); 
+  background: linear-gradient(90deg, rgb(255, 152, 0) 0%, rgb(255, 193, 7) 100%) !important; 
+  color: white !important; 
   font-weight: 900; 
   font-size: 1.4rem; 
   letter-spacing: 0.08em; 
   text-transform: uppercase;
   justify-content: center; 
   align-items: center;
-  border: none; 
+  border: none !important; 
+  border-radius: 50%; 
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4), 0 3px 8px rgba(0, 0, 0, 0.1) !important; 
+  cursor: pointer; 
+  transition: background 0.13s, box-shadow 0.13s, transform 0.11s, letter-spacing 0.1s; 
+  outline: none; 
+  opacity: 1; 
+  transform: scale(1); 
+  overflow: hidden;
+  visibility: visible !important;
+}
+
+#activeScanner {
+  position: fixed !important;
+  display: flex !important;
+  width: 75px !important; 
+  height: 75px !important;
+  top: 105px !important;
+  right: 25px !important;
+  z-index: 99999 !important;
+  padding: 1em 2.8em; 
+  margin-top: 0.19em; 
+  background: linear-gradient(90deg, rgb(56, 189, 248) 0%, rgb(167, 139, 250) 100%) !important; 
+  color: rgb(255, 255, 255) !important; 
+  font-weight: 900; 
+  font-size: 1.4rem; 
+  letter-spacing: 0.08em; 
+  text-transform: uppercase;
+  justify-content: center; 
+  align-items: center;
+  border: none !important; 
   border-radius: 50%; 
   box-shadow: rgba(124, 77, 255, 0.094) 0px 2px 12px, rgba(56, 189, 248, 0.133) 0px 2px 8px; 
   cursor: pointer; 
@@ -140,6 +180,7 @@
   opacity: 1; 
   transform: scale(1); 
   overflow: hidden;
+  visibility: visible !important;
 }
 
 #inactiveScanner {
@@ -172,24 +213,24 @@
 }
 
 #timeOutScanner {
-  position: fixed;
-  display: flex;
-  width: 75px; 
-  height: 75px;
-  top: 105px;
-  right: 25px;
-  z-index: 9999;
+  position: fixed !important;
+  display: flex !important;
+  width: 75px !important; 
+  height: 75px !important;
+  top: 105px !important;
+  right: 25px !important;
+  z-index: 99999 !important;
   padding: 1em 2.8em; 
   margin-top: 0.19em; 
-  background: linear-gradient(90deg, rgb(201, 201, 167) 0%, rgb(235, 235, 37) 100%); 
-  color: black; 
+  background: linear-gradient(90deg, rgb(201, 201, 167) 0%, rgb(235, 235, 37) 100%) !important; 
+  color: black !important; 
   font-weight: 900; 
   font-size: 1.4rem; 
   letter-spacing: 0.08em; 
   text-transform: uppercase;
   justify-content: center; 
   align-items: center;
-  border: none; 
+  border: none !important; 
   border-radius: 50%; 
   box-shadow: rgba(124, 77, 255, 0.094) 0px 2px 12px, rgba(56, 189, 248, 0.133) 0px 2px 8px; 
   cursor: pointer; 
@@ -198,56 +239,57 @@
   opacity: 1; 
   transform: scale(1); 
   overflow: hidden;
+  visibility: visible !important;
 }
 
 #matchFoundScanner {
-  position: fixed;
-  display: flex;
-  width: 75px; 
-  height: 75px;
-  top: 105px;
-  right: 180px;
-  z-index: 9999;
+  position: fixed !important;
+  display: flex !important;
+  width: 90px !important; 
+  height: 90px !important;
+  top: 80px !important;
+  right: 110px !important;
+  z-index: 99999 !important;
   padding: 1em 2.8em; 
   margin-top: 0.19em; 
-  background: linear-gradient(90deg, rgb(56, 189, 248) 0%, rgb(167, 139, 250) 100%);
-  color: white; 
+  background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(16, 185, 129) 50%, rgb(5, 150, 105) 100%) !important;
+  color: white !important; 
   font-weight: 900; 
-  font-size: 1.4rem; 
-  letter-spacing: 0.08em; 
+  font-size: 1.5rem; 
+  letter-spacing: 0.1em; 
   text-transform: uppercase;
   justify-content: center; 
   align-items: center;
-  border: none; 
+  border: none !important; 
   border-radius: 50%; 
-  box-shadow: rgba(124, 77, 255, 0.094) 0px 2px 12px, rgba(56, 189, 248, 0.133) 0px 2px 8px; 
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4), 0 4px 12px rgba(0, 0, 0, 0.1) !important; 
   cursor: pointer; 
-  transition: background 0.13s, box-shadow 0.13s, transform 0.11s, letter-spacing 0.1s; 
   outline: none; 
   opacity: 1; 
-  transform: scale(1); 
   overflow: hidden;
+  visibility: visible !important;
+  animation: greenFlash 0.8s ease-in-out !important;
 }
 
 #matchNotFoundScanner {
-  position: fixed;
-  display: flex;
-  width: 75px; 
-  height: 75px;
-  top: 105px;
-  right: 25px;
-  z-index: 9999;
+  position: fixed !important;
+  display: flex !important;
+  width: 75px !important; 
+  height: 75px !important;
+  top: 105px !important;
+  right: 25px !important;
+  z-index: 99999 !important;
   padding: 1em 2.8em; 
   margin-top: 0.19em; 
-  background: linear-gradient(90deg, rgb(255, 136, 136) 0%, rgb(250, 38, 38) 100%); 
-  color: white; 
+  background: linear-gradient(90deg, rgb(255, 136, 136) 0%, rgb(250, 38, 38) 100%) !important; 
+  color: white !important; 
   font-weight: 900; 
   font-size: 1.4rem; 
   letter-spacing: 0.08em; 
   text-transform: uppercase;
   justify-content: center; 
   align-items: center;
-  border: none; 
+  border: none !important; 
   border-radius: 50%; 
   box-shadow: rgba(124, 77, 255, 0.094) 0px 2px 12px, rgba(56, 189, 248, 0.133) 0px 2px 8px; 
   cursor: pointer; 
@@ -256,6 +298,7 @@
   opacity: 1; 
   transform: scale(1); 
   overflow: hidden;
+  visibility: visible !important;
 }
 
 #tryAgain {
@@ -353,38 +396,26 @@
   }
 }
 
-@keyframes goodShake {
+@keyframes greenFlash {
   0% { 
-    transform: translateX(0); 
-    background: linear-gradient(90deg, rgb(56, 189, 248) 0%, rgb(167, 139, 250) 100%); 
+    background: #3B82F6;
+    transform: scale(1);
   }
-  12.5% {
-    background: rgba(0, 255, 106, 0.25); 
-  }
-  25% { 
-    transform: translateX(-5px); 
-    background: rgba(0, 255, 106, 0.5);
-  }
-  37.5% {
-    background: rgba(0, 255, 106, 0.75);
+  25% {
+    background: #10B981;
+    transform: scale(1.1);
   }
   50% { 
-    transform: translateX(5px); 
-    background: rgba(0, 255, 106, 1); 
+    background: #059669;
+    transform: scale(1.1);
   }
-  62.5% {
-    background: rgba(0, 255, 106, 0.75); 
-  }
-  75% { 
-    transform: translateX(-5px);
-    background: rgba(0, 255, 106, 0.5); 
-  }
-  87.5% {
-    background: rgba(0, 255, 106, 0.25); 
+  75% {
+    background: #10B981;
+    transform: scale(1.1);
   }
   100% { 
-    transform: translateX(0);
-    background: linear-gradient(90deg, rgb(56, 189, 248) 0%, rgb(167, 139, 250) 100%);
+    background: #3B82F6;
+    transform: scale(1);
   }
 }
 
@@ -428,15 +459,42 @@
 }
 
 .Match {
-  animation: goodShake 0.5s ease-in-out;
+  animation: greenFlash 0.8s ease-in-out !important;
 }
 
 .noMatch {
-  animation: badShake 0.5s ease-in-out;
+  animation: badShake 0.5s ease-in-out !important;
 }
 
 .timeOut {
-  color: black;
-  animation: timeShake 0.5s ease-in-out;
+  color: black !important;
+  animation: timeShake 0.5s ease-in-out !important;
+}
+
+.aborted {
+  animation: abortedPulse 1s ease-in-out !important;
+}
+
+@keyframes abortedPulse {
+  0% { 
+    transform: scale(1);
+    background: linear-gradient(90deg, rgb(255, 152, 0) 0%, rgb(255, 193, 7) 100%);
+  }
+  25% {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, rgb(255, 193, 7) 0%, rgb(255, 152, 0) 100%);
+  }
+  50% { 
+    transform: scale(1.1);
+    background: linear-gradient(90deg, rgb(255, 235, 59) 0%, rgb(255, 193, 7) 100%);
+  }
+  75% {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, rgb(255, 193, 7) 0%, rgb(255, 152, 0) 100%);
+  }
+  100% { 
+    transform: scale(1);
+    background: linear-gradient(90deg, rgb(255, 152, 0) 0%, rgb(255, 193, 7) 100%);
+  }
 }
 

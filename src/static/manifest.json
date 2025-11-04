@@ -1,7 +1,8 @@
 {
-  "name": "xRay Extension NEW",
-  "description": "Endpoint rerouting service extension",
+  "name": "xRay - Amazon Price Comparison",
+  "description": "Find better deals while shopping on Amazon. Scan products to discover lower prices from alternative sources and save money on your purchases.",
   "version": "1.0.0",
+  "homepage_url": "https://tryxray.ai",
   "manifest_version": 3,
   "icons": {
     "16": "icon.png",
@@ -13,8 +14,8 @@
     "default_title": "xRay Extension NEW",
     "default_icon": "icon.png"
   },
-  "permissions": ["storage", "contextMenus", "scripting", "tabs"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": ["storage", "contextMenus", "activeTab"],
+  "host_permissions": ["https://api.tryxray.ai/"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'" 
   },
@@ -23,7 +24,21 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"], 
+      "matches": [
+        "*://*.amazon.com/*",
+        "*://*.amazon.co.uk/*", 
+        "*://*.amazon.ca/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.es/*",
+        "*://*.amazon.co.jp/*",
+        "*://*.amazon.in/*",
+        "*://*.amazon.com.au/*",
+        "*://*.amazon.com.mx/*",
+        "*://*.amazon.com.br/*",
+        "*://tryxray.ai/*"
+      ], 
       "js": ["contentScript.js"],
       "css": ["contentScript.css"],
       "run_at": "document_idle"

@@ -75,16 +75,92 @@ export function SignUpRequired() {
             id='SignUp_div' 
             style={{
                 position: 'fixed', 
-                width: '200px', 
-                top: '165px', 
-                right: '25px', 
-                height: '200px', 
-                justifyContent: 'center', 
-                background: 'radial-gradient(100% 60% at 50% 0%, rgb(231, 243, 255) 0%, rgb(227, 231, 255) 1124%, rgb(243, 235, 253) 90%, rgb(252, 253, 255) 100%) no-repeat fixed, linear-gradient(rgb(229, 242, 250) 0%, rgb(250, 249, 254) 100%)'
+                top: '190px',
+                right: '50px',
+                width: '280px', 
+                padding: '20px',
+                backgroundColor: '#ffffff',
+                borderRadius: '12px',
+                boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e0e7ff',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                zIndex: 10000,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
             }}
         >
-            <h1>Sorry!!! You Must Sign Up Here!!!!!: <br /></h1>
-            <a href='https://tryxray.ai'>Join xRay</a>
+            <div style={{
+                width: '48px',
+                height: '48px',
+                backgroundColor: '#3b82f6',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '16px'
+            }}>
+                <span style={{
+                    color: 'white',
+                    fontSize: '24px',
+                    fontWeight: 'bold'
+                }}>X</span>
+            </div>
+            
+            <h2 style={{
+                margin: '0 0 8px 0',
+                fontSize: '20px',
+                fontWeight: '600',
+                color: '#1f2937',
+                lineHeight: '1.3'
+            }}>
+                Sign Up Required
+            </h2>
+            
+            <p style={{
+                margin: '0 0 20px 0',
+                fontSize: '14px',
+                color: '#6b7280',
+                lineHeight: '1.5'
+            }}>
+                Create your free xRay account to start finding better deals on Amazon products.
+            </p>
+            
+            <a 
+                href='https://tryxray.ai'
+                style={{
+                    display: 'inline-block',
+                    padding: '12px 24px',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    textDecoration: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    transition: 'all 0.2s ease',
+                    border: 'none',
+                    cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#2563eb';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#3b82f6';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                }}
+            >
+                Join xRay - It's Free!
+            </a>
+            
+            <p style={{
+                margin: '16px 0 0 0',
+                fontSize: '12px',
+                color: '#9ca3af'
+            }}>
+                Already have an account? Visit tryxray.ai to sign in
+            </p>
         </div>
     );
 }

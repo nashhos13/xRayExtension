@@ -2,7 +2,6 @@ import { ProductCache } from '../types';
 import { checkUserKey, sendProductCacheToAll, checkForSignUp } from './messageHandlers';
 import { sanitizeProductCache } from './sanitization';
 import { doAmazonScrape } from '../scrapers/amazonScraper';
-import { doShopifyScrape } from '../scrapers/shopifyScraper';
 
 export async function scrapeAfterLoad(productCache: ProductCache) {
     const currentUrl = window.location.href;
@@ -20,13 +19,9 @@ export async function scrapeAfterLoad(productCache: ProductCache) {
             console.log("starting scrape");
             productCache.url = document.URL;
 
-            if (productCache.type === 'Amazon') {
-                console.log("Amazon Product---");
-                doAmazonScrape(productCache);
-            } else {
-                console.log("Shopify Product---");
-                doShopifyScrape(productCache);
-            }
+            // Since we only support Amazon now, always use Amazon scraper
+            console.log("Amazon Product---");
+            doAmazonScrape(productCache);
 
             // Avoid circular refs from HTMLElement in Shopify image objects
             const safeReplacer = (_key: string, value: any) => {

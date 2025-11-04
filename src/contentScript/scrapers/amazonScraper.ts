@@ -95,7 +95,8 @@ export function amazonProductTextScraper(productCache: ProductCache): void {
         technicalDescriptions.forEach(d => {
             productTechnicalDescription.push(d.textContent);
         });
-        productCache.techDescription = productTechnicalDescription;
+        // Join the array into a string for the final payload
+        productCache.techDescription = productTechnicalDescription.join(" ");
     }
 }
 

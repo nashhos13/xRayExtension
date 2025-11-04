@@ -48,7 +48,7 @@ export interface ProductCache {
     title: string | null;
     descriptions: string[];
     techDetails: any[];
-    techDescription: string[];
+    techDescription: string;
 }
 
 export interface ScrapedProduct extends ProductCache {

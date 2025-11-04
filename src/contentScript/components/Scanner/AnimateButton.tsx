@@ -20,7 +20,7 @@ export const AnimateButton: React.FC<AnimateButtonProps> = ({
     productCache,
     buttonStyle
 }) => {
-    const interval = useRef<NodeJS.Timeout | null>(null);
+    const interval = useRef<ReturnType<typeof setInterval> | null>(null);
     const [text, setText] = useState(WORDS);
 
     // Word scramble animation on button hover
@@ -59,15 +59,27 @@ export const AnimateButton: React.FC<AnimateButtonProps> = ({
     const waitForResponse = () => {
         console.log("Checking scan");
 
-        chrome.storage.local.get('xRayCertified').then((result) => {
-            if (result.xRayCertified === true) {
-                setButtonStatus('activeScanner');
-                if (productCache.type != null) {
-                    setScanStatus('scanning');
+        chrome.storage.local.get('xRayCertified').then(async (result) => {
+            try {
+                if (result.xRayCertified === true) {
+                    setButtonStatus('activeScanner');
+                    if (productCache.type != null) {
+                        // Store the current URL where scan is starting and reset tab changed flag
+                        await chrome.storage.local.set({ 
+                            scanStartedUrl: window.location.href 
+                        });
+                        await chrome.storage.local.remove('tabChanged');
+                        setScanStatus('scanning');
+                        
+                        // Lock tab during scan
+                        (window as any).lockTab?.();
+                    }
                 }
+            } catch (error) {
+                console.error("Error starting scan:", error);
             }
         });
-        scrapeAfterLoad(productCache);
+        scrapeAfterLoad(productCache); // ---------------------------------------------------------------- THIS IS WHERE THE PRODUCT SCRAPE BEGINS !!!!!!!
     };
 
     return (

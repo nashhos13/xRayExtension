@@ -15,8 +15,14 @@ console.log("xRay Extension: Content script loaded!");
 
 // Using shared productCache from productCache.ts
 
+// BRUTE FORCE: Block all functionality when user leaves page
+let contentScriptDisabled = false;
+
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
+        console.log("xRay: Page hidden - DISABLING ALL FUNCTIONALITY");
+        contentScriptDisabled = true;
+        
         chrome.runtime.sendMessage({ message: 'Abort Fetch', payload: {} }, (res) => {
             console.log("ABORT?", res)
         });
@@ -40,6 +46,13 @@ function isValidRequest(request: any): request is {status: string, message: stri
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
     (async () => {
+
+        // BRUTE FORCE: Block all messages if content script is disabled
+        if (contentScriptDisabled) {
+            console.log("xRay: Content script disabled - blocking message:", request.message);
+            sendResponse({message: "Content Script Disabled", payload: {}});
+            return;
+        }
 
         const activeButton = document.getElementById('activeScanner')
         const inactiveButton = document.getElementById('inactiveScanner')
@@ -107,40 +120,18 @@ chrome.storage.local.remove('productCache').then(() => {
 
     console.log("xRay: Starting detection. Current URL:", window.location.href);
 
-    // Check For Amazon Domain
-    const hasAmazonUrl = (window.location.href).includes("amazon")
-    if (hasAmazonUrl) {
-        productCache.type = 'Amazon'
-        console.log("xRay: Detected Amazon site");
-    }
+    const onXrayHomePage = window.location.href.includes("tryxray.ai");
 
-    // Check For Shopify Domain
-    if (!productCache.type) {
-        const hasShopifyId = Array.from(document.querySelectorAll('[id]')).some(el => 
-            (el as HTMLElement).id.includes('shopify')
-        );
-
-        if (hasShopifyId) {
-            productCache.type = 'Shopify'
-            console.log("xRay: Detected Shopify site");
-        }
-    }
-
-    const onXrayHomePage = window.location.href
-
-    console.log("xRay: productCache.type =", productCache.type);
-
-    if (productCache.type != null) {
-        console.log("xRay: Calling renderScanner");
-        renderScanner(productCache)
-
-    } else if (onXrayHomePage.includes("tryxray.ai")) {
+    if (onXrayHomePage) {
         console.log("xRay: On tryxray.ai homepage");
-        renderScanner(productCache)
-        checkForSignUp("Invalid User")
-
+        renderScanner(productCache);
+        checkForSignUp("Invalid User");
     } else {
-        console.log("xRay: No matching site detected");
+        // Since manifest restricts to Amazon domains, we know this is Amazon
+        productCache.type = 'Amazon';
+        console.log("xRay: Detected Amazon site");
+        console.log("xRay: Calling renderScanner");
+        renderScanner(productCache);
     }
 
 })

@@ -47,7 +47,7 @@ export const Scanner: React.FC<ScannerProps> = ({ product, buttonID }) => {
             buttonStyle={buttonStatus}
         />;
     } else if (scanStatus === 'scanning') {
-        button = <div>
+        button = <div className="xray-scanner-container">
             <h1 id='stayOnPageBox'></h1>
             <span id='stayOnPageMessage'>Please Do Not Leave Page!!!</span>
             <div id='stayOnPageQuoteBox'></div>
@@ -56,19 +56,17 @@ export const Scanner: React.FC<ScannerProps> = ({ product, buttonID }) => {
             </button>
         </div>;
     } else if (scanStatus === 'match') {
-        button = <div>
+        button = <div className="xray-scanner-container">
             <button id='matchFoundScanner' className='Match'>MATCH!</button>
-            <button id='tryAgain' onClick={() => tryAgain()}>Try Again</button>
         </div>;
     } else if (scanStatus === 'noMatch') {
-        button = <div>
-            <h1 id='matchNotFoundBox'></h1>
-            <span id='matchNotFoundMessage'>Match Not Found</span>
-            <div id='matchNotFoundQuoteBox'></div>
-            <button id='matchNotFoundScanner' className='noMatch' onClick={() => setScanStatus('notScanning')}>Try Again</button>
+        button = <div className="xray-scanner-container">
+            <div id='xProofBox'>
+                This Product is X-proof
+            </div>
         </div>;
     } else if(scanStatus === 'timeOut') {
-        button = <div>
+        button = <div className="xray-scanner-container">
             <h1 id='timeOutBox'></h1>
             <span id='timeOutMessage'>Something Went Wrong</span>
             <div id='timeOutQuoteBox'></div>

@@ -5,6 +5,12 @@ import { ProductCache } from '../types';
 import { Scanner } from '../components/Scanner';
 
 export function injectFoundProduct(productCache: ProductCache | null, currentUrl: string | null, currentCheckoutID: string | null) {
+    // BRUTE FORCE: Block all product injection if page is hidden
+    if (document.visibilityState === 'hidden') {
+        console.log("xRay: BLOCKING product injection - page is hidden");
+        return;
+    }
+
     const existing = document.getElementById('found-product');
     if (existing) {
         existing.remove();
@@ -29,6 +35,12 @@ export function injectFoundProduct(productCache: ProductCache | null, currentUrl
 }
 
 export function renderScanner(productCache: ProductCache) {
+    // BRUTE FORCE: Block scanner rendering if page is hidden
+    if (document.visibilityState === 'hidden') {
+        console.log("xRay: BLOCKING scanner render - page is hidden");
+        return;
+    }
+
     console.log("xRay: renderScanner called with", productCache);
     const container = document.createElement('div');
     document.body.appendChild(container);

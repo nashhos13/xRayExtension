@@ -8,9 +8,24 @@ let userController: AbortController | null = null;
 
 export function abortCurrentFetch() {
     if (userController) {
+        
         userController.abort();
         console.log("Fetch aborted due to tab switch");
         userController = null;
+        
+        // Disable UI on all content scripts
+        chrome.tabs.query({}, (tabs) => {
+            tabs.forEach((tab) => {
+                if (tab.id) {
+                    chrome.tabs.sendMessage(tab.id, {
+                        status: "Success",
+                        message: "Disable UI"
+                    }).catch(() => {
+                        // Ignore errors for tabs that don't have content script
+                    });
+                }
+            });
+        });
     }
 }
 
@@ -44,7 +59,7 @@ export async function fetchUserActivationFromXray(request: any): Promise<UserAct
                     "Accept": "application/json"
                 },
                 body: JSON.stringify({ MESSAGE: request.message }),
-                // signal: mergedSignal
+                signal: mergedSignal
             });
 
             if (!postResponse.ok) {
@@ -88,7 +103,7 @@ export async function fetchProductFromXray(request: any): Promise<ProductFetchRe
                     "Accept": "application/json"
                 },
                 body: JSON.stringify({ MESSAGE: request.payload }),
-                // signal: mergedSignal
+                signal: mergedSignal
             });
 
             console.log("POST RESPONSE:", postResponse);

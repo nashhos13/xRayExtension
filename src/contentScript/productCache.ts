@@ -15,7 +15,7 @@ export type ProductCache = {
   title: string | null;
   descriptions: string[];
   techDetails: string[];
-  techDescription: string[];
+  techDescription: string;
 };
 
 // Mutable cache object - exported so other modules can read/write the same reference
@@ -28,7 +28,7 @@ export const productCache: ProductCache = {
   title: null,
   descriptions: [],
   techDetails: [],
-  techDescription: []
+  techDescription: ""
 };
 
 // Helper API for safe operations against the above cache
@@ -44,6 +44,6 @@ export const productCacheAPI = {
     productCache.title = null;
     productCache.descriptions.length = 0;
     productCache.techDetails.length = 0;
-    productCache.techDescription.length = 0;
+    productCache.techDescription = "";
   }
 };
