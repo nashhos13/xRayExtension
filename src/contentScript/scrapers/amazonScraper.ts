@@ -8,6 +8,9 @@ export function getAmazonProduct(): HTMLElement | null {
 
 export function amazonProductImageScraper(productCache: ProductCache): void {
     const leftProductColumn = document.querySelector("#leftCol");
+
+    if (!leftProductColumn) return;
+
     const tempImages = Array.from(leftProductColumn.querySelectorAll("img"));
     
     tempImages.forEach(img => {
@@ -21,6 +24,7 @@ export function amazonProductImageScraper(productCache: ProductCache): void {
 export function amazonProductTextScraper(productCache: ProductCache): void {
     const centerProductColumn = document.querySelector("#centerCol");
 
+    if (!centerProductColumn) return;
     // Title Scraping
     const titles = Array.from(document.querySelectorAll('span[id*=title], span[id*=Title]'));
 
@@ -47,7 +51,7 @@ export function amazonProductTextScraper(productCache: ProductCache): void {
     var descriptionArray = [];
     const conciseDescriptors = centerProductColumn.querySelectorAll("div[id*=bullets], div[id*=Bullets], div[id*=overview], div[id*=Overview], div[id*=facts], div[id*=Facts]");
 
-    if (conciseDescriptors.length == 0) {
+    if (conciseDescriptors && conciseDescriptors.length == 0) {
         const allText = Array.from(centerProductColumn.querySelectorAll("span"));
         allText.forEach((text) => {
             const trimmedText = text.textContent.trim();
@@ -103,6 +107,8 @@ export function amazonProductTextScraper(productCache: ProductCache): void {
 export function amazonProductPriceScraper(productCache: ProductCache): void {
     var priceArray = [];
     const centerProductColumn = document.querySelector("#centerCol");
+    if (!centerProductColumn) return;
+    
     const allPrices = centerProductColumn.querySelectorAll("span[id*=price], span[id*=Price], span[id*=pricing], span[id*=pricing], span[class*=price], span[class*=Price], span[class*=pricing], span[class*=Pricing], span[class*=offscreen]");
 
     allPrices.forEach((span) => {

@@ -129,6 +129,7 @@ async function retrieveProduct(product: any): Promise<boolean> {
         // Send Scraped Product to xRay API
         const foundProduct = await fetchProductFromXray(product);
 
+        console.log("Found Product from xRay: ", foundProduct);
         // Set Local Product Cache before sending message
         if (foundProduct && checkForProperProduct(foundProduct)) {
             await chrome.storage.local.set({ productCache: foundProduct });
