@@ -10,48 +10,27 @@ export function abortCurrentFetch() {
     if (userController) {
         
         userController.abort();
-        console.log("Fetch aborted due to tab switch");
         userController = null;
-        
-        // Disable UI on all content scripts
-        chrome.tabs.query({}, (tabs) => {
-            tabs.forEach((tab) => {
-                if (tab.id) {
-                    chrome.tabs.sendMessage(tab.id, {
-                        status: "Success",
-                        message: "Disable UI"
-                    }).catch(() => {
-                        // Ignore errors for tabs that don't have content script
-                    });
-                }
-            });
-        });
     }
 }
 
-function mergeAbortSignals(...signals: (AbortSignal | undefined)[]): AbortSignal {
-    const controller = new AbortController();
+// function mergeAbortSignals(...signals: (AbortSignal | undefined)[]): AbortSignal {
+//     const controller = new AbortController();
 
-    signals.forEach(signal => {
-        if (!signal) return;
-        if (signal.aborted) controller.abort();
-        else signal.addEventListener('abort', () => controller.abort(), { once: true });
-    });
+//     signals.forEach(signal => {
+//         if (!signal) return;
+//         if (signal.aborted) controller.abort();
+//         else signal.addEventListener('abort', () => controller.abort(), { once: true });
+//     });
 
-    return controller.signal;
-}
+//     return controller.signal;
+// }
 
 export async function fetchUserActivationFromXray(request: any): Promise<UserActivationResponse | null> {
     userController = new AbortController();
-    const timeOutController = new AbortController();
-    setTimeout(() => timeOutController.abort(), 20000);
-
-    const mergedSignal = mergeAbortSignals(timeOutController.signal, userController.signal);
 
     try {
         if (request.message === 'Signed Up') {
-            console.log("User Id Request:", request);
-
             const postResponse = await fetch("https://api.tryxray.ai/ext/handshake/start", {
                 method: "POST",
                 headers: {
@@ -59,7 +38,7 @@ export async function fetchUserActivationFromXray(request: any): Promise<UserAct
                     "Accept": "application/json"
                 },
                 body: JSON.stringify({ MESSAGE: request.message }),
-                signal: mergedSignal
+                signal: userController.signal
             });
 
             if (!postResponse.ok) {
@@ -67,7 +46,6 @@ export async function fetchUserActivationFromXray(request: any): Promise<UserAct
             }
 
             const postData = await postResponse.json();
-            console.log("POST response:", postData);
 
             if (!checkForUserActivation(postData)) {
                 throw new Error('Invalid userDetails response from xRay API');
@@ -87,15 +65,9 @@ export async function fetchUserActivationFromXray(request: any): Promise<UserAct
 
 export async function fetchProductFromXray(request: any): Promise<ProductFetchResult> {
     userController = new AbortController();
-    const timeOutController = new AbortController();
-    setTimeout(() => timeOutController.abort(), 20000);
-
-    const mergedSignal = mergeAbortSignals(timeOutController.signal, userController.signal);
 
     try {
         if (request.message === 'Product Request') {
-            console.log("Product Requested: ", request);
-
             const postResponse = await fetch("https://api.tryxray.ai/scan-from-product-json", {
                 method: "POST",
                 headers: {
@@ -103,13 +75,10 @@ export async function fetchProductFromXray(request: any): Promise<ProductFetchRe
                     "Accept": "application/json"
                 },
                 body: JSON.stringify({ MESSAGE: request.payload }),
-                signal: mergedSignal
+                signal: userController.signal
             });
 
-            console.log("POST RESPONSE:", postResponse);
-
             const postData = await postResponse.json();
-            console.log("POST response:", postData);
 
             if (!checkForProperProduct(postData)) {
                 return "No Match";

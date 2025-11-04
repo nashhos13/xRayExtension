@@ -56,27 +56,22 @@ export const AnimateButton: React.FC<AnimateButtonProps> = ({
     };
 
     // Initiate Product Scan upon click (IF Certified User) --> change button status
-    const waitForResponse = () => {
-        console.log("Checking scan");
+    const waitForResponse = async () => {
 
-        chrome.storage.local.get('xRayCertified').then(async (result) => {
-            try {
-                if (result.xRayCertified === true) {
-                    setButtonStatus('activeScanner');
-                    if (productCache.type != null) {
-                        // Store the current URL where scan is starting and reset tab changed flag
-                        await chrome.storage.local.set({ 
-                            scanStartedUrl: window.location.href 
-                        });
-                        await chrome.storage.local.remove('tabChanged');
-                        setScanStatus('scanning');
-                        
-                        // Lock tab during scan
-                        (window as any).lockTab?.();
-                    }
+        await chrome.storage.local.get('productQueue').then((result) => {
+            let queue = result.productQueue || [];
+            queue++;
+            chrome.storage.local.set({ productQueue: queue });
+        });
+
+        await chrome.storage.local.set({ tabChanged: false });
+
+        chrome.storage.local.get('xRayCertified').then((result) => {
+            if (result.xRayCertified === true) {
+                setButtonStatus('activeScanner');
+                if (productCache.type != null) {
+                    setScanStatus('scanning');
                 }
-            } catch (error) {
-                console.error("Error starting scan:", error);
             }
         });
         scrapeAfterLoad(productCache); // ---------------------------------------------------------------- THIS IS WHERE THE PRODUCT SCRAPE BEGINS !!!!!!!

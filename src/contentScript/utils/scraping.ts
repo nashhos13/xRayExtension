@@ -10,17 +10,13 @@ export async function scrapeAfterLoad(productCache: ProductCache) {
         lastUrlScraped: currentUrl
     });
 
-    console.log("ON SITE");
-
     const validUser = await checkUserKey("xRayCertified");
 
     if (validUser) {
         setTimeout(() => {
-            console.log("starting scrape");
             productCache.url = document.URL;
 
             // Since we only support Amazon now, always use Amazon scraper
-            console.log("Amazon Product---");
             doAmazonScrape(productCache);
 
             // Avoid circular refs from HTMLElement in Shopify image objects
@@ -32,9 +28,7 @@ export async function scrapeAfterLoad(productCache: ProductCache) {
                 }
                 return value;
             };
-            console.log("RAW productCache BEFORE sanitization:", JSON.stringify(productCache as any, safeReplacer, 2));
             const sanitizedCache = sanitizeProductCache(productCache);
-            console.log("SANITIZED productCache AFTER sanitization:", JSON.stringify(sanitizedCache, null, 2));
             sendProductCacheToAll(sanitizedCache);
 
         }, 2000);

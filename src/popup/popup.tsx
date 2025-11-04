@@ -11,13 +11,10 @@ import { OrderConfirmed } from './pages/OrderConfirmed';
 // Most components are going to be used in the Content Script. The Popup is no longer active
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log(message);
     sendResponse("Message has been RECEIVED");
 });
 
 export function ChromeApp({ product, checkoutID, url }: { product: any; checkoutID: string; url: string }) {
-    console.log("Checkout id IN APP", "((", checkoutID, "))");
-    console.log("Url IN APP", url);
 
     const [validUser, setValidUser] = useState<boolean | null>(null);
     const [view, setView] = useState<string>('matchfound');
@@ -44,19 +41,14 @@ export function ChromeApp({ product, checkoutID, url }: { product: any; checkout
     if (validUser === null) return <SignUpRequired />;
     if (!validUser) return <SignUpRequired />;
 
-    console.log("IDK?? --> ", view);
-
     let page;
 
     if (product && product.matched_product_title) {
         if (checkoutID && url.includes('success?session_id=' + checkoutID)) {
-            console.log("ORDERED");
             page = <OrderConfirmed product={product} setView={setView} />;
         } else if (view === 'checkout') {
-            console.log("CHECKOUT");
             page = <Checkout product={product} setView={setView} renderedVariant={variant} setVariant={setVariant} variantIndex={variant} />;
         } else if (view === 'matchfound') {
-            console.log("MATCH FOUND -- ", variant);
             page = <MatchFound product={product} setView={setView} renderedVariant={variant} setVariant={setVariant} variantIndex={variant} />;
         }
 
@@ -70,14 +62,10 @@ export function ChromeApp({ product, checkoutID, url }: { product: any; checkout
 ------------------------------ ONLY USED IF WE WANT TO IMPLEMENT POPUP --------------------------------
 
 chrome.storage.local.get('productCache').then(async (result) => {
-    console.log("PRODUCT: ", result.productCache)
     let finalProduct;
 
     const checkoutSessionID = await chrome.storage.local.get('checkoutID')
     const currentUrl = await chrome.storage.local.get('lastUrlScraped')
-
-    console.log("currentUrl", currentUrl)
-    console.log("chekoutID", checkoutSessionID)
 
     if (result.productCache != undefined) {
         finalProduct = result.productCache

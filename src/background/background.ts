@@ -10,21 +10,11 @@ import {
     handleAbortFetch
 } from './handlers';
 
-// Create context menu item
-chrome.contextMenus.create({
-    title: "xRay Scan",
-    id: "XRS1",
-    contexts: ["page"]
-});
-
 // Message listener - routes messages to appropriate handlers
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("RAW MESSAGE: ", request);
-
     const validMessage = isValidMessage(request);
 
     if (!validMessage) {
-        console.log("Message not accepted");
         return false;
     }
 

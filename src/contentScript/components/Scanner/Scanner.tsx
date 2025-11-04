@@ -17,13 +17,10 @@ export const Scanner: React.FC<ScannerProps> = ({ product, buttonID }) => {
             if (result && result.scanComplete === true) {
                 chrome.storage.local.get('productCache').then((result) => {
                     if (!result || Object.keys(result).length === 0) {
-                        console.log("Timeout");
                         setScanStatus('timeOut');
                     } else if (result.productCache.matched_product_title) {
-                        console.log("Matched");
                         setScanStatus('match');
                     } else {
-                        console.log("No Match");
                         setScanStatus('noMatch');
                     }
                 });

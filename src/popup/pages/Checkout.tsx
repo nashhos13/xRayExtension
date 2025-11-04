@@ -14,8 +14,6 @@ export function Checkout({ product, setView, variantIndex, setVariant, renderedV
     const [orderInfo, setOrderInfo] = useState<any>(null);
     const selectedVariant = product['selectedVariantID'];
 
-    console.log("Transferred Product:", product);
-
     let imgDisplayed;
     if (renderedVariant) {
         for (const key in renderedVariant) {
@@ -36,10 +34,7 @@ export function Checkout({ product, setView, variantIndex, setVariant, renderedV
                         selected_sku: selectedVariant
                     };
 
-                    console.log("Customer Info: ", customerInfo);
-
                     const orderInfo = await sendMessageToBackground({ message: "ODR", payload: customerInfo });
-                    console.log("Order Details found --> ", orderInfo);
 
                     setOrderInfo(orderInfo['message']);
 
@@ -63,8 +58,6 @@ export function Checkout({ product, setView, variantIndex, setVariant, renderedV
             userID: user_ID['xRayId'],
             scanID: scan_ID
         };
-
-        console.log("payload: ", scanInfo);
 
         try {
             const url_payload = await sendMessageToBackground({ message: "COR", payload: scanInfo });

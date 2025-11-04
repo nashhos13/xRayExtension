@@ -121,6 +121,6 @@ export function doAmazonScrape(productCache: ProductCache): void {
         amazonProductTextScraper(productCache);
         amazonProductPriceScraper(productCache);
     } else { 
-        console.log("Error: Could not locate Amazon product");
+        // Error: Could not locate Amazon product
     }
 }

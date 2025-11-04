@@ -65,8 +65,6 @@ export function cleanImgArray(productCache: any): string[] {
 export function cleanDescriptionArray(descriptions: string[]): string[] {
     const cleanDescriptionArray: string[] = [];
 
-    console.log("TYPE?? ", descriptions);
-
     descriptions.forEach((d) => {
         if (!cleanDescriptionArray.includes(d)) {
             cleanDescriptionArray.push(d);
@@ -91,13 +89,8 @@ export function setInitialProduct(product: any): Record<string, any> {
         const newKey = VARIANTS[key].id;
         const baseValue = VARIANTS[key].values[0];
 
-        console.log(`Key: ${newKey} ---- Value: ${baseValue}`);
-
         productState[newKey] = baseValue;
     }
-    
-    console.log("Variants: ", VARIANTS);
-    console.log("Product State --> ", productState);
 
     return productState;
 }

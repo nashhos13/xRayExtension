@@ -15,11 +15,11 @@ export async function handleSignUp(request: any, sendResponse: (response: any) =
         const userInfo = await fetchUserActivationFromXray(request);
 
         if (userInfo && checkForUserActivation(userInfo)) {
-            console.log("USER INFO: ", userInfo);
             // Set user as valid user
             await chrome.storage.local.set({
                 xRayId: userInfo.user_id,
-                xRayCertified: true
+                xRayCertified: true,
+                productQueue: 0
             });
 
             // Add color to button (Indicating ready for use)
@@ -34,7 +34,6 @@ export async function handleSignUp(request: any, sendResponse: (response: any) =
 }
 
 export function handleInvalidScanAttempt() {
-    console.log("Attempted Scan");
     sendToCS({ status: "Success", message: "Send To Xray" });
 }
 
@@ -43,8 +42,6 @@ export function handleInvalidUser(sendResponse: (response: any) => void) {
 }
 
 export async function handleOrderDetailsRequest(request: any, sendResponse: (response: any) => void) {
-    console.log("Order Details requested --> ", request);
-
     try {
         const response = await fetchOrderDetails(request.payload);
         sendResponse({ status: "Success", message: response });
@@ -55,19 +52,14 @@ export async function handleOrderDetailsRequest(request: any, sendResponse: (res
 }
 
 export async function handleCheckoutRequest(request: any, sendResponse: (response: any) => void) {
-    console.log("Checkout Requested --> ", request);
-
     try {
         const url_payload = await fetchCheckoutSession(request.payload);
-
-        console.log("Response Payload Updated: ", url_payload);
 
         if (url_payload) {
             chrome.storage.local.set({
                 checkoutID: url_payload['checkout_session_id']
             });
 
-            console.log("Attempt URL switch");
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 if (!tabs || tabs.length === 0 || !tabs[0]) {
                     console.error("No active tab found for checkout redirect");
@@ -88,13 +80,24 @@ export async function handleCheckoutRequest(request: any, sendResponse: (respons
 }
 
 export async function handleProductRequest(request: any, sendResponse: (response: any) => void) {
-    console.log("Requesting Product: ", request);
-
     try {
         const productFound = await retrieveProduct(request);
         await chrome.storage.local.set({ scanComplete: true });
+        await chrome.storage.local.get('productQueue').then((result) => {
+            let queue = result.productQueue
+            if (queue > 0) {
+                queue--;
+                chrome.storage.local.set({ productQueue: queue });
+            }
+        })
 
         if (productFound) {
+            chrome.storage.local.get('productQueue').then((result) => {
+                const queuePosition = result.productQueue;
+                if (queuePosition <= 0) {
+                    sendToCS({ status: "Success", message: "Scan Complete" });
+                }
+            })
             sendResponse({ status: "Success", message: "Product Found" });
         } else {
             sendResponse({ status: "Failed", message: "Product Search Failed" });
@@ -111,11 +114,8 @@ export function handleAbortFetch(sendResponse: (response: any) => void) {
 }
 
 async function retrieveProduct(product: any): Promise<boolean> {
-    console.log("USING NEW RETRIEVAL");
-
     // Ensure product being requested is attached to a valid userID
     const result = await chrome.storage.local.get('xRayId');
-    console.log("User ID: ", result.xRayId);
 
     if (result.xRayId) {
         product.payload.userID = result.xRayId;
@@ -123,16 +123,15 @@ async function retrieveProduct(product: any): Promise<boolean> {
         throw new Error('Do not have valid user ID attached to product request');
     }
 
+    
+
     try {
         // Send Scraped Product to xRay API
         const foundProduct = await fetchProductFromXray(product);
-        console.log("What is found? --> ", foundProduct);
 
         // Set Local Product Cache before sending message
         if (foundProduct && checkForProperProduct(foundProduct)) {
             await chrome.storage.local.set({ productCache: foundProduct });
-            sendToCS({ status: "Success", message: "Scan Complete" });
-            console.log("Sending product");
             return true;
         } else if (foundProduct === 'Error') {
             sendToCS({ status: 'Failed', message: 'Timeout During Request' });

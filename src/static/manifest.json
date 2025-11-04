@@ -1,6 +1,6 @@
 {
   "name": "xRay - Amazon Price Comparison",
-  "description": "Find better deals while shopping on Amazon. Scan products to discover lower prices from alternative sources and save money on your purchases.",
+  "description": "Find better deals while shopping on Amazon. Scan products to discover lower prices from alternative sources.",
   "version": "1.0.0",
   "homepage_url": "https://tryxray.ai",
   "manifest_version": 3,
@@ -14,7 +14,7 @@
     "default_title": "xRay Extension NEW",
     "default_icon": "icon.png"
   },
-  "permissions": ["storage", "contextMenus", "activeTab"],
+  "permissions": ["storage", "activeTab", "contextMenus"],
   "host_permissions": ["https://api.tryxray.ai/"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'" 

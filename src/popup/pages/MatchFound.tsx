@@ -12,8 +12,6 @@ interface MatchFoundProps {
 }
 
 export function MatchFound({ product, setView, renderedVariant, setVariant, variantIndex }: MatchFoundProps) {
-    console.log("PRODUCT INFO: ", product);
-    console.log("Current variant ++ ", renderedVariant);
 
     if (!renderedVariant) {
         return null;
@@ -29,12 +27,7 @@ export function MatchFound({ product, setView, renderedVariant, setVariant, vari
 
     const finalKey = masterKey.slice(0, -1);
 
-    console.log("MASTER KEY: ", finalKey);
-    console.log("TOTAL VARIANTS:", product.skus['variant_label_count']);
-
     const updateProductState = (select: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log("Option selected: ", select.target);
-        console.log("Value selected: ", select.target.value);
 
         const variantChanged = select.target.id;
         const newVariant = select.target.value;
@@ -54,7 +47,6 @@ export function MatchFound({ product, setView, renderedVariant, setVariant, vari
         }
 
         setVariant(updatedProductState);
-        console.log("New Product State: ", updatedProductState);
     };
 
     // Check which variant contains img
@@ -66,8 +58,6 @@ export function MatchFound({ product, setView, renderedVariant, setVariant, vari
     }
 
     product['selectedVariantID'] = finalKey;
-
-    console.log("Current Variant info -----> ", product.skus.sku_index[finalKey]);
 
     let VARIANTS;
     let productIndex;

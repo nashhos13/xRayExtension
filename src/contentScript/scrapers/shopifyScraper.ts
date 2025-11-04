@@ -16,7 +16,6 @@ export function getShopifyProduct(): HTMLElement | null {
 
         if ( !shopifySections || !(shopifySections.length > 0) ) {
             const likelyProductSections = Array.from(mainElement.querySelectorAll("div, section"));
-            console.log("DATA LABEL: ", likelyProductSections);
 
             likelyProductSections.forEach(section => {
                 const label = section.getAttribute("data-label");
@@ -24,14 +23,12 @@ export function getShopifyProduct(): HTMLElement | null {
                 if (label == "Product" || label == "product") {
                     possibleProducts.push(section);
                 } else if (section.clientHeight >= 700 && section.clientWidth >= 700) {
-                    console.log(`Element: ${section}`, `Width: ${section.clientWidth}`, `Height: ${section.clientHeight}`);
                     possibleProducts.push(section);
                 }
             });
 
             if (possibleProducts.length > 0) {
                 if (possibleProducts[0] instanceof HTMLElement) {
-                    console.log("Possibly??? ", possibleProducts[0]);
                     return possibleProducts[0];
                 }
             }
@@ -47,7 +44,6 @@ export function getShopifyProduct(): HTMLElement | null {
         });
         
         if (mainProduct instanceof HTMLElement) {
-            console.log("MAIN PRODUCT: ", mainProduct);
             return mainProduct;
         }
     } else {
@@ -197,7 +193,7 @@ export function shopifyProductPriceScraper(productCache: ProductCache): void {
             }
         }
     } else {
-        console.log("No Shopify main product found for price scraping");
+        // No Shopify main product found for price scraping
     }
 }
 
