@@ -108,7 +108,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // --------------------------- Scraping Hierarchy ---------------------
 // Ensure Local Product Cache is NULL
-chrome.storage.local.remove('productCache').then(() => {
+chrome.storage.local.remove('productCache').then(async () => {
+
+    chrome.storage.local.set({
+        productQueue: 0
+    })
 
     const onXrayHomePage = window.location.href.includes("tryxray.ai");
 

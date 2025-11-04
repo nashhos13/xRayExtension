@@ -11,6 +11,8 @@ export async function injectFoundProduct(productCache: ProductCache | null, curr
         }
     })
 
+    console.log('Injecting found product UI');
+
     const existing = document.getElementById('found-product');
     if (existing) {
         existing.remove();

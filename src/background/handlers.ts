@@ -94,7 +94,7 @@ export async function handleProductRequest(request: any, sendResponse: (response
         if (productFound) {
             chrome.storage.local.get('productQueue').then((result) => {
                 const queuePosition = result.productQueue;
-                if (queuePosition <= 0) {
+                if (queuePosition === 0) {
                     sendToCS({ status: "Success", message: "Scan Complete" });
                 }
             })
