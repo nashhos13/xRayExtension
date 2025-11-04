@@ -4,7 +4,13 @@ import { ChromeApp } from '../../popup/popup';
 import { ProductCache } from '../types';
 import { Scanner } from '../components/Scanner';
 
-export function injectFoundProduct(productCache: ProductCache | null, currentUrl: string | null, currentCheckoutID: string | null) {
+export async function injectFoundProduct(productCache: ProductCache | null, currentUrl: string | null, currentCheckoutID: string | null) {
+    await chrome.storage.local.get('tabChanged').then((result) => {
+        if (result.tabChanged) {
+            return;
+        }
+    })
+
     const existing = document.getElementById('found-product');
     if (existing) {
         existing.remove();
